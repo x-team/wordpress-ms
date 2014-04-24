@@ -1,0 +1,10 @@
+/wp-cli.local.yml
+/docroot/wp-content/uploads/*
+/config/active-env
+/config/*-mine.env.php
+/config/*-overrides.env.php
+/*.komodoproject
+/config/forced-https-url-patterns
+.sass-cache
+**/*.sublime-project
+**/*.sublime-workspace

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e
+
+beanstalk_remote_name=beanstalk
+beanstalk_url=git@x-team.beanstalkapp.com:/x-team/wp-stream-com.git
+target_branch=develop
+
+if [ "$(git config remote.$beanstalk_remote_name.url)" != "$beanstalk_url" ]; then
+    echo "Add Beanstalk remote"
+    git remote add -f $beanstalk_remote_name $beanstalk_url
+fi
+git fetch beanstalk
+
+original_branch=$(git rev-parse --abbrev-ref HEAD)
+if [ $original_branch != $target_branch ]; then
+    echo "Checking out $target_branch branch. If you wanted to deploy the changes from the $original_branch branch, first do:"
+    echo "$ git checkout $target_branch"
+    echo "$ git merge $original_branch"
+    git checkout $target_branch
+fi
+
+echo "Making sure $target_branch branch is up to date from GitHub"
+git pull --no-edit origin $target_branch
+echo "Making sure $target_branch branch is up to date from Beanstalk"
+git pull --no-edit $beanstalk_remote_name $target_branch
+echo "Pushing $target_branch branch to GitHub"
+git push origin HEAD:$target_branch
+echo "Pushing $target_branch branch to Beanstalk, triggering deploy"
+git push $beanstalk_remote_name HEAD:$target_branch
+
+if [ $original_branch != $target_branch ]; then
+    git checkout $original_branch
+fi
+
+echo "All done"
+
+if command -v say >/dev/null 2>&1; then
+    say -r300 'Deployment to staging.wp-stream.com has been queued up; please wait for Beanstalk!'
+fi

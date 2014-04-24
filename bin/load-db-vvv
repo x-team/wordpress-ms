@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -e
+cd $(dirname $0)/..
+if [ $USER != 'vagrant' ]; then
+	echo "Error: Must be run in the vagrant environment" 1>&2
+	exit 1
+fi
+if [ $(cat config/active-env) != 'vvv' ]; then
+	echo "Error: Only applicable in vvv environment" 1>&2
+	exit 1
+fi
+
+dump_file=database/vvv-data.sql
+
+wp eval '
+	global $wpdb;
+	$wpdb->query( "DROP TABLE " . join( ", ", $wpdb->get_col( "SHOW TABLES" ) ) );
+	if ( empty( $wpdb->last_error ) ) {
+		echo "Dropped tables prior to load\n";
+		exit(0);
+	}
+	else {
+		echo "WPDB error: $wpdb->last_error\n";
+		exit(1);
+	}
+'
+
+mysql $(wp eval '
+	printf( "--host=%s ", DB_HOST );
+	printf( "--user=%s ", DB_USER );
+	printf( "--password=%s ", DB_PASSWORD );
+	printf( "--default-character-set=utf8 " );
+	printf( "%s ", DB_NAME );
+') < $dump_file
+
+sudo service memcached restart

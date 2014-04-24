@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+cd $(dirname $0)
+cd ../
+
+sed '/COMMITTERS:/q' docroot/humans.txt > docroot/humans.txt~
+
+git shortlog -sn master >> docroot/humans.txt~
+mv docroot/humans.txt{~,}
+git add docroot/humans.txt
+git status docroot/humans.txt

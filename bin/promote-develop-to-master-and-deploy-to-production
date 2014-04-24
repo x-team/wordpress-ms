@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd $(dirname $0)
+
+original_branch=$(git rev-parse --abbrev-ref HEAD)
+if [ $original_branch != 'develop' ]; then
+    echo "Error: Please checkout the develop branch."
+    exit 1
+fi
+
+git checkout master
+echo "Merging develop into master"
+git pull --no-edit origin master
+git pull --no-edit origin develop
+./deploy-master-branch-to-production
+
+git checkout develop
