@@ -69,3 +69,5 @@ Password: `password`
 [1]: https://github.com/x-team/varying-vagrant-vagrants/tree/develop
 [2]: https://github.com/10up/varying-vagrant-vagrants
 [3]: https://github.com/x-team/varying-vagrant-vagrants/tree/develop#the-first-vagrant-up
+
+Maintained by the [developers at x-team](https://www.x-team.com) | [developer blog](https://www.x-team.com/blog/)
